@@ -1,6 +1,6 @@
 # Astromate: Research & Technical Documentation
 **Problem Statement:** SIH25142 - Student Innovation: Swadeshi for Atmanirbhar Bharat - Space Technology  
-**Team Name:** [Your Team Name]  
+**Team Name:** AURALITH  
 **Solution:** An Integrated AI System for Astronaut Cognitive & Environmental Safety
 
 ---
