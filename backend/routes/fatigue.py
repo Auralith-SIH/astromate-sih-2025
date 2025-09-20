@@ -9,7 +9,7 @@ def simulate():
     sample = current_app.simulator.generate_fatigue_measurement()
     return jsonify(sample)
 
-# 2️⃣ Evaluate a given fatigue score with thresholds + cognitive prediction
+# 2️⃣ Evaluate a given fatigue score with thresholds + cognitive prediction (ML)
 @fatigue_bp.route("/evaluate", methods=["POST"])
 def evaluate():
     data = request.get_json(force=True)
@@ -29,16 +29,22 @@ def evaluate():
         status = "OK"
         action = "Fatigue level normal"
 
-    # Cognitive prediction using CogTwin
-    cognitive_prediction = current_app.cogtwin.predict_cognitive_state(fatigue_score)
+    # ✅ Cognitive prediction using ML (CogTwin)
+    cognitive_prediction = current_app.cogtwin.predict_cognitive_performance(fatigue_score)
 
+    # Log the evaluation
     entry = {
         "timestamp": time.time(),
         "input": {"fatigue_score": fatigue_score},
-        "result": {"status": status, "action": action, "cognitive_prediction": cognitive_prediction}
+        "result": {
+            "status": status,
+            "action": action,
+            "cognitive_prediction": {"cognitive_performance": cognitive_prediction}
+        }
     }
     current_app.fatigue_history.append(entry)
 
+    # Add to actions if ALARM
     if status == "ALARM":
         current_app.actions_history.append({
             "timestamp": entry["timestamp"],
@@ -46,11 +52,12 @@ def evaluate():
             "description": action
         })
 
+    # Return the evaluation
     return jsonify({
         "status": status,
         "action": action,
         "input": {"fatigue_score": fatigue_score},
-        "cognitive_prediction": cognitive_prediction
+        "cognitive_prediction": {"cognitive_performance": cognitive_prediction}
     })
 
 # 3️⃣ Get the last 100 fatigue evaluations
